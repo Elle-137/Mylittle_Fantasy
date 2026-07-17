@@ -1,0 +1,187 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>无缝滚动</title>
+    <link rel="stylesheet" href="css.css">
+</head>
+<body>
+    <div class="back-image">
+        <div class="box1">
+            <div class="shared sliding1-1" id="1-1"></div>
+            <div class="shared sliding1-2" id="1-2"></div>
+        </div>
+        <div class="box2">
+            <div class="shared sliding2-1" id="2-1"></div>
+            <div class="shared sliding2-2" id="2-2"></div>
+        </div>
+        <div class="box3">
+            <div class="shared sliding3-1" id="3-1"></div>
+            <div class="shared sliding3-2" id="3-2"></div>
+        </div>
+        <div class="box4">
+            <div class="shared sliding4-1" id="4-1"></div>
+            <div class="shared sliding4-2" id="4-2"></div>
+        </div>
+        <div class="box5">
+            <div class="shared sliding5-1" id="5-1"></div>
+            <div class="shared sliding5-2" id="5-2"></div>
+        </div>
+        <div class="box6">
+            <div class="shared sliding6-1" id="6-1"></div>
+            <div class="shared sliding6-2" id="6-2"></div>
+        </div>
+        <div class="box7">
+            <div class="shared sliding7-1" id="7-1"></div>
+            <div class="shared sliding7-2" id="7-2"></div>
+        </div>
+    </div>
+</body>
+<script>
+    // 可重用的滚动动画控制器
+    class ScrollAnimationController {
+        constructor() {
+            this.animations = [];
+            this.animationId = null;
+        }
+        
+        // 动画配置
+        addAnimation(config) {
+            const { id1, id2, speed, imageWidth, initialPosition1, initialPosition2, direction = 'right' } = config;
+            
+            const element1 = document.getElementById(id1);
+            const element2 = document.getElementById(id2);
+            
+            if (!element1 || !element2) {
+                console.warn(`Elements with IDs ${id1} or ${id2} not found`);
+                return;
+            }
+            
+            this.animations.push({
+                element1,
+                element2,
+                speed: direction === 'right' ? speed : -speed,
+                imageWidth,
+                position1: initialPosition1,
+                position2: initialPosition2
+            });
+        }
+        
+        // 动画循环
+        animate() {
+            this.animations.forEach(animation => {
+                const { element1, element2, speed, imageWidth } = animation;
+                
+                // 更新位置
+                animation.position1 += speed;
+                animation.position2 += speed;
+                
+                // 重置位置
+                if (speed > 0) {
+                    // 向右滚动
+                    if (animation.position2 >= imageWidth) {
+                        animation.position2 = animation.position1 - imageWidth;
+                    }
+                    if (animation.position1 >= imageWidth) {
+                        animation.position1 = animation.position2 - imageWidth;
+                    }
+                }
+                // 应用变换
+                element1.style.transform = `translateX(${animation.position1}px)`;
+                element2.style.transform = `translateX(${animation.position2}px)`;
+            });
+            
+            this.animationId = requestAnimationFrame(() => this.animate());
+        }
+        
+        // 开始所有动画
+        start() {
+            this.animate();
+        }
+    }
+    
+    // 创建动画控制器实例
+    const scrollController = new ScrollAnimationController();
+    
+    // 配置box7的动画
+    scrollController.addAnimation({
+        id1: '7-1',
+        id2: '7-2',
+        speed: 1,
+        imageWidth: 3200,
+        initialPosition1: -3200,
+        initialPosition2: 0,
+        direction: 'right'
+    });
+    
+    // 配置box6的动画
+    scrollController.addAnimation({
+        id1: '6-1',
+        id2: '6-2',
+        speed: 1.5,
+        imageWidth: 3000, 
+        initialPosition1: -3000,
+        initialPosition2: 0,
+        direction: 'right'
+    });
+    
+    // 配置box5的动画
+    scrollController.addAnimation({
+        id1: '5-1',
+        id2: '5-2',
+        speed: 2.5,
+        imageWidth: 2968,
+        initialPosition1: -2968,
+        initialPosition2: 0,
+        direction: 'right'
+    });
+
+    // 配置box4的动画
+    scrollController.addAnimation({
+        id1: '4-1',
+        id2: '4-2',
+        speed: 3,
+        imageWidth: 3200,
+        initialPosition1: -3200,
+        initialPosition2: 0,
+        direction: 'right'
+    });
+
+    // 配置box3的动画
+    scrollController.addAnimation({
+        id1: '3-1',
+        id2: '3-2',
+        speed: 3.5,
+        imageWidth: 3200,
+        initialPosition1: -3200,
+        initialPosition2: 0,
+        direction: 'right'
+    });
+
+    // 配置box2的动画
+    scrollController.addAnimation({
+        id1: '2-1',
+        id2: '2-2',
+        speed: 4,
+        imageWidth: 3200,
+        initialPosition1: -3200,
+        initialPosition2: 0,
+        direction: 'right'
+    });
+
+    // 配置box1的动画
+    scrollController.addAnimation({
+        id1: '1-1',
+        id2: '1-2',
+        speed: 4.5,
+        imageWidth: 2880,
+        initialPosition1: -2880,
+        initialPosition2: 0,
+        direction: 'right'
+    });
+    
+    // 开始动画
+    scrollController.start();
+</script>
+</html>

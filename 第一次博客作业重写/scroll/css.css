@@ -1,0 +1,154 @@
+body
+{
+    margin: 0;
+    width: 100%;
+    height: 100vh;
+}
+.back-image {
+    overflow: hidden;
+    width: 100%;
+    height: 100%;
+    position: relative; 
+    background-color: #000000;
+
+}
+
+.shared
+{
+    width: 100%; 
+    position: absolute;
+    left: 0;
+}
+
+.mask
+{
+
+}
+
+.box1
+{
+    position: absolute;
+    width: 100%;
+    height: 656px;
+    bottom: 300px;
+    filter: brightness(0.3);
+}
+
+.sliding1-1, .sliding1-2 {
+    background-image: url("./img/1.png");
+    background-repeat: repeat-x;
+    image-rendering: pixelated;
+    background-size: 2880px 656px;
+    width: 2880px;
+    height: 656px;
+}
+
+.box2
+{
+    position: absolute;
+    width: 100%;
+    height: 444px;
+    bottom: 300px;
+    filter: brightness(0.4);
+}
+
+.sliding2-1, .sliding2-2 {
+    background-image: url("./img/2.png");
+    background-repeat: repeat-x;
+    image-rendering: pixelated;
+    background-size: 2880px 444px;
+    width: 2880px;
+    height: 444px;
+}
+
+.box3
+{
+    position: absolute;
+    width: 100%;
+    height: 548px;
+    bottom: 300px;
+    filter: brightness(0.5);
+}
+
+.sliding3-1,.sliding3-2 {
+    background-image: url("./img/3.png");
+    background-repeat: repeat-x;
+    image-rendering: pixelated;
+    background-size: 2880px 548px;
+    width: 2880px;
+    height: 548px;
+}
+
+.box4
+{
+    position: absolute;
+    width: 100%;
+    height: 300px;
+    bottom: 220px;
+    filter: brightness(0.6);
+}
+
+.sliding4-1,.sliding4-2 {
+    background-image: url("./img/4.png");
+    background-repeat: repeat-x;
+    image-rendering: pixelated;
+    background-size: 2880px 300px;
+    width: 2880px;
+    height: 300px;
+}
+
+.box5
+{
+    position: absolute;
+    width: 100%;
+    height: 364.5px;
+    bottom: 70px;
+    filter: brightness(0.6);
+}
+
+.sliding5-1,.sliding5-2 {
+    background-image: url("./img/5.png");
+    background-repeat: repeat-x;
+    image-rendering: pixelated;
+    background-size: 2880px 364.5px;
+    width: 2880px;
+    height: 364.5px;
+}
+
+.box6
+{
+    position: absolute;
+    width: 100%;
+    height: 64px;
+    bottom: 64px;
+    filter: brightness(0.6);
+}
+
+.sliding6-1,.sliding6-2 {
+    background-image: url("./img/6.png");
+    background-repeat: repeat-x;
+    image-rendering: pixelated;
+    background-size: 3000px 310px;
+    width: 3000px;
+    height: 310px;
+    position: absolute;
+} 
+
+.box7
+{
+    position: absolute;
+    width: 100%;
+    height: 125px;
+    bottom: 0;
+}
+
+.sliding7-1, .sliding7-2 {
+    background-image: url("./img/7.png");
+    background-repeat: repeat-x;
+    image-rendering: pixelated;
+    background-size: 3200px 500px;
+    width: 3200px;
+    height: 500px;
+    position: absolute;
+    bottom: -290px;
+}
