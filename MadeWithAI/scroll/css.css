@@ -1,0 +1,214 @@
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    background: linear-gradient(135deg, #0f0c29, #302b63, #24243e);
+    min-height: 100vh;
+    padding: 20px;
+    color: #e0e0ff;
+}
+
+.container {
+    max-width: 1200px;
+    margin: 40px auto;
+    background: rgba(255, 255, 255, 0.08);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    border-radius: 20px;
+    overflow: hidden;
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.header {
+    background: rgba(0, 0, 0, 0.3);
+    color: #ffffff;
+    text-align: center;
+    padding: 30px;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.header h1 {
+    font-size: 2.5em;
+    margin-bottom: 10px;
+    font-weight: 300;
+    letter-spacing: 1px;
+    background: linear-gradient(to right, #8e9eab, #eef2f3);
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+}
+
+.header p {
+    font-size: 1.1em;
+    opacity: 0.8;
+}
+
+.scroll-container {
+    width: 100%;
+    overflow: hidden;
+    background: rgba(0, 0, 0, 0.2);
+    padding: 20px 0;
+    margin: 20px 0;
+}
+
+.scroll-wrapper {
+    display: flex;
+    animation: scroll 20s linear infinite;
+}
+
+.scroll-wrapper:hover {
+    animation-play-state: paused;
+}
+
+.scroll-item {
+    flex-shrink: 0;
+    width: 300px;
+    height: 200px;
+    margin: 0 10px;
+    border-radius: 10px;
+    overflow: hidden;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+    transition: all 0.4s ease;
+    position: relative;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.scroll-item:hover {
+    transform: translateY(-10px) scale(1.03);
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.4);
+    border-color: rgba(255, 255, 255, 0.3);
+}
+
+.scroll-item img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transition: transform 0.5s ease;
+}
+
+.scroll-item:hover img {
+    transform: scale(1.1);
+}
+
+.image-overlay {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    background: rgba(0, 0, 0, 0.6);
+    color: white;
+    padding: 15px;
+    transform: translateY(100%);
+    transition: transform 0.4s ease;
+    backdrop-filter: blur(5px);
+    -webkit-backdrop-filter: blur(5px);
+    border-top: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.scroll-item:hover .image-overlay {
+    transform: translateY(0);
+}
+
+.controls {
+    text-align: center;
+    padding: 30px;
+    background: rgba(0, 0, 0, 0.2);
+    border-top: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.btn {
+    background: rgba(255, 255, 255, 0.1);
+    color: #e0e0ff;
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    padding: 12px 25px;
+    margin: 0 10px;
+    border-radius: 25px;
+    cursor: pointer;
+    font-size: 16px;
+    transition: all 0.3s ease;
+    backdrop-filter: blur(5px);
+    -webkit-backdrop-filter: blur(5px);
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+}
+
+.btn:hover {
+    background: rgba(255, 255, 255, 0.2);
+    transform: translateY(-3px);
+    box-shadow: 0 6px 20px rgba(0, 0, 0, 0.3);
+}
+
+.btn:active {
+    transform: translateY(1px);
+}
+
+.speed-control {
+    margin-top: 20px;
+}
+
+.speed-control label {
+    color: #e0e0ff;
+    margin-right: 10px;
+    font-size: 16px;
+}
+
+.speed-control input[type="range"] {
+    width: 200px;
+    margin: 0 10px;
+    background: rgba(255, 255, 255, 0.1);
+    border-radius: 10px;
+    height: 6px;
+    outline: none;
+    -webkit-appearance: none;
+}
+
+.speed-control input[type="range"]::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    width: 20px;
+    height: 20px;
+    border-radius: 50%;
+    background: #8e9eab;
+    cursor: pointer;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.3);
+}
+
+.speed-value {
+    color: #8e9eab;
+    font-weight: bold;
+    margin-left: 10px;
+    font-size: 16px;
+}
+
+@keyframes scroll {
+    0% {
+        transform: translateX(0);
+    }
+    100% {
+        transform: translateX(-50%);
+    }
+}
+
+.scroll-wrapper.double {
+    width: max-content;
+}
+
+/* 响应式设计 */
+@media (max-width: 768px) {
+    .scroll-item {
+        width: 250px;
+        height: 150px;
+    }
+    
+    .header h1 {
+        font-size: 2em;
+    }
+    
+    .btn {
+        padding: 10px 20px;
+        font-size: 14px;
+    }
+}

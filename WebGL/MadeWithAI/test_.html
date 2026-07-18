@@ -1,0 +1,655 @@
+<function_calls>
+<invoke name="show_widget"><parameter name="title">
+<parameter name="loading_messages">
+<parameter name="widget_code">
+<style>
+  :root {
+    --bg-dark: #0a0a0f;
+    --bg-card: #12121a;
+    --accent: #6366f1;
+    --accent-glow: rgba(99, 102, 241, 0.3);
+    --text-primary: #e2e8f0;
+    --text-secondary: #94a3b8;
+    --border: #1e293b;
+  }
+  
+  .container {
+    background: var(--bg-dark);
+    color: var(--text-primary);
+    font-family: 'Inter', -apple-system, sans-serif;
+    padding: 24px;
+    border-radius: 16px;
+    max-width: 900px;
+    margin: 0 auto;
+  }
+  
+  .header {
+    text-align: center;
+    margin-bottom: 24px;
+  }
+  
+  .header h2 {
+    font-size: 24px;
+    font-weight: 700;
+    background: linear-gradient(135deg, #818cf8 0%, #c084fc 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    margin: 0 0 8px 0;
+  }
+  
+  .header p {
+    color: var(--text-secondary);
+    font-size: 14px;
+    margin: 0;
+  }
+  
+  .tabs {
+    display: flex;
+    gap: 8px;
+    margin-bottom: 20px;
+    flex-wrap: wrap;
+    justify-content: center;
+  }
+  
+  .tab {
+    padding: 10px 20px;
+    border-radius: 10px;
+    border: 1px solid var(--border);
+    background: var(--bg-card);
+    color: var(--text-secondary);
+    cursor: pointer;
+    font-size: 13px;
+    font-weight: 500;
+    transition: all 0.3s ease;
+    user-select: none;
+  }
+  
+  .tab:hover {
+    border-color: var(--accent);
+    color: var(--text-primary);
+  }
+  
+  .tab.active {
+    background: var(--accent);
+    color: white;
+    border-color: var(--accent);
+    box-shadow: 0 0 20px var(--accent-glow);
+  }
+  
+  .demo-area {
+    background: var(--bg-card);
+    border-radius: 12px;
+    border: 1px solid var(--border);
+    overflow: hidden;
+    position: relative;
+    height: 400px;
+  }
+  
+  .canvas-container {
+    width: 100%;
+    height: 100%;
+    position: relative;
+  }
+  
+  canvas {
+    display: block;
+    width: 100%;
+    height: 100%;
+  }
+  
+  .info-panel {
+    margin-top: 16px;
+    padding: 16px;
+    background: var(--bg-card);
+    border-radius: 12px;
+    border: 1px solid var(--border);
+  }
+  
+  .info-panel h3 {
+    font-size: 16px;
+    margin: 0 0 12px 0;
+    color: #818cf8;
+  }
+  
+  .info-panel p {
+    font-size: 13px;
+    line-height: 1.7;
+    color: var(--text-secondary);
+    margin: 0;
+  }
+  
+  .code-block {
+    background: #0d0d12;
+    border-radius: 8px;
+    padding: 12px 16px;
+    margin-top: 12px;
+    font-family: 'Fira Code', 'Consolas', monospace;
+    font-size: 12px;
+    color: #a5b4fc;
+    overflow-x: auto;
+    line-height: 1.6;
+  }
+  
+  .highlight { color: #f472b6; }
+  .keyword { color: #c084fc; }
+  .string { color: #86efac; }
+  .comment { color: #64748b; }
+  .number { color: #fbbf24; }
+  
+  .controls-hint {
+    position: absolute;
+    bottom: 12px;
+    left: 50%;
+    transform: translateX(-50%);
+    background: rgba(0,0,0,0.7);
+    padding: 6px 16px;
+    border-radius: 20px;
+    font-size: 12px;
+    color: var(--text-secondary);
+    pointer-events: none;
+    backdrop-filter: blur(4px);
+  }
+  
+  .stats {
+    position: absolute;
+    top: 12px;
+    right: 12px;
+    background: rgba(0,0,0,0.6);
+    padding: 6px 12px;
+    border-radius: 8px;
+    font-size: 11px;
+    color: var(--text-secondary);
+    font-family: monospace;
+    backdrop-filter: blur(4px);
+  }
+</style>
+<div class="container">
+  <div class="header">
+    <h2>🎨 Web 前端交互式技术体验</h2>
+    <p>点击标签切换不同技术 Demo，移动鼠标与场景交互</p>
+  </div>
+  <div class="tabs">
+    <div class="tab active" onclick="switchTab('particles')">✨ 粒子引力场</div>
+    <div class="tab" onclick="switchTab('waves')">🌊 正弦波网格</div>
+    <div class="tab" onclick="switchTab('constellation')">🌌 星座连线</div>
+    <div class="tab" onclick="switchTab('ripple')">💧 波纹扩散</div>
+  </div>
+  <div class="demo-area">
+    <div class="canvas-container">
+      <canvas id="mainCanvas"></canvas>
+      <div class="controls-hint" id="hint">移动鼠标吸引粒子 · 点击产生冲击波</div>
+      <div class="stats" id="stats">FPS: 60 | Particles: 800</div>
+    </div>
+  </div>
+  <div class="info-panel" id="infoPanel">
+    <h3>✨ 粒子引力场系统</h3>
+    <p>模拟 800 个粒子在二维空间中的物理运动。每个粒子受鼠标位置产生的引力场影响，同时带有速度衰减（摩擦力）和边界反弹。点击时会在鼠标位置产生一个径向冲击波，将周围粒子推开。</p>
+    <div class="code-block">
+<span class="comment">// 核心物理更新逻辑</span>
+<span class="keyword">const</span> dx = mouse.x - particle.x;
+<span class="keyword">const</span> dy = mouse.y - particle.y;
+<span class="keyword">const</span> dist = Math.sqrt(dx*dx + dy*dy);
+<span class="keyword">const</span> force = (dist < <span class="number">200</span>) ? (mouse.isDown ? <span class="number">-500</span> : <span class="number">200</span>) / dist : <span class="number">0</span>;
+particle.vx += (dx / dist) * force * dt;
+particle.vy += (dy / dist) * force * dt;
+particle.vx *= <span class="number">0.95</span>; <span class="comment">// 摩擦力衰减</span>
+    </div>
+  </div>
+</div>
+<script>
+const canvas = document.getElementById('mainCanvas');
+const ctx = canvas.getContext('2d');
+const stats = document.getElementById('stats');
+const hint = document.getElementById('hint');
+
+let width, height;
+let currentTab = 'particles';
+let animationId;
+let mouse = { x: 0, y: 0, isDown: false };
+let lastTime = 0;
+
+// Resize handling
+function resize() {
+  const rect = canvas.parentElement.getBoundingClientRect();
+  canvas.width = rect.width;
+  canvas.height = rect.height;
+  width = canvas.width;
+  height = canvas.height;
+}
+window.addEventListener('resize', resize);
+resize();
+
+// Mouse tracking
+canvas.addEventListener('mousemove', (e) => {
+  const rect = canvas.getBoundingClientRect();
+  mouse.x = e.clientX - rect.left;
+  mouse.y = e.clientY - rect.top;
+});
+canvas.addEventListener('mousedown', () => mouse.isDown = true);
+canvas.addEventListener('mouseup', () => mouse.isDown = false);
+canvas.addEventListener('mouseleave', () => { mouse.x = -1000; mouse.y = -1000; });
+
+// ======== PARTICLE SYSTEM ========
+class ParticleSystem {
+  constructor(count) {
+    this.particles = [];
+    for (let i = 0; i < count; i++) {
+      this.particles.push({
+        x: Math.random() * width,
+        y: Math.random() * height,
+        vx: (Math.random() - 0.5) * 2,
+        vy: (Math.random() - 0.5) * 2,
+        radius: Math.random() * 2 + 1,
+        hue: Math.random() * 60 + 240
+      });
+    }
+  }
+  
+  update(dt) {
+    this.particles.forEach(p => {
+      const dx = mouse.x - p.x;
+      const dy = mouse.y - p.y;
+      const dist = Math.sqrt(dx*dx + dy*dy);
+      
+      if (dist < 300 && dist > 1) {
+        const force = mouse.isDown ? -800 : 300;
+        const f = force / (dist * dist) * 100;
+        p.vx += (dx / dist) * f * dt;
+        p.vy += (dy / dist) * f * dt;
+      }
+      
+      // Friction
+      p.vx *= 0.96;
+      p.vy *= 0.96;
+      
+      // Update position
+      p.x += p.vx;
+      p.y += p.vy;
+      
+      // Boundary bounce
+      if (p.x < 0 || p.x > width) { p.vx *= -0.8; p.x = Math.max(0, Math.min(width, p.x)); }
+      if (p.y < 0 || p.y > height) { p.vy *= -0.8; p.y = Math.max(0, Math.min(height, p.y)); }
+    });
+  }
+  
+  draw(ctx) {
+    ctx.fillStyle = 'rgba(10, 10, 15, 0.2)';
+    ctx.fillRect(0, 0, width, height);
+    
+    this.particles.forEach(p => {
+      const speed = Math.sqrt(p.vx*p.vx + p.vy*p.vy);
+      const alpha = Math.min(1, speed / 5 + 0.3);
+      const size = p.radius + speed * 0.3;
+      
+      ctx.beginPath();
+      ctx.arc(p.x, p.y, size, 0, Math.PI * 2);
+      ctx.fillStyle = `hsla(${p.hue}, 80%, 60%, ${alpha})`;
+      ctx.fill();
+      
+      // Glow effect
+      ctx.beginPath();
+      ctx.arc(p.x, p.y, size * 3, 0, Math.PI * 2);
+      ctx.fillStyle = `hsla(${p.hue}, 80%, 60%, ${alpha * 0.1})`;
+      ctx.fill();
+    });
+  }
+}
+
+// ======== WAVE GRID ========
+class WaveGrid {
+  constructor() {
+    this.cols = 30;
+    this.rows = 20;
+    this.time = 0;
+  }
+  
+  update(dt) {
+    this.time += dt * 2;
+  }
+  
+  draw(ctx) {
+    ctx.fillStyle = 'rgba(10, 10, 15, 0.3)';
+    ctx.fillRect(0, 0, width, height);
+    
+    const cellW = width / this.cols;
+    const cellH = height / this.rows;
+    
+    for (let i = 0; i <= this.cols; i++) {
+      for (let j = 0; j <= this.rows; j++) {
+        const x = i * cellW;
+        const y = j * cellH;
+        
+        // Distance from mouse
+        const dx = mouse.x - x;
+        const dy = mouse.y - y;
+        const dist = Math.sqrt(dx*dx + dy*dy);
+        const mouseInfluence = Math.max(0, 1 - dist / 200) * 30;
+        
+        // Sine wave height
+        const wave = Math.sin(i * 0.3 + this.time) * Math.cos(j * 0.3 + this.time * 0.7) * 15;
+        const height = 5 + Math.abs(wave) + mouseInfluence;
+        
+        const hue = (i * 5 + j * 3 + this.time * 20) % 360;
+        
+        ctx.beginPath();
+        ctx.arc(x, y, height * 0.4, 0, Math.PI * 2);
+        ctx.fillStyle = `hsla(${hue}, 70%, 60%, 0.8)`;
+        ctx.fill();
+      }
+    }
+    
+    // Draw connections
+    ctx.strokeStyle = 'rgba(99, 102, 241, 0.15)';
+    ctx.lineWidth = 1;
+    for (let i = 0; i < this.cols; i++) {
+      ctx.beginPath();
+      for (let j = 0; j <= this.rows; j++) {
+        const x = i * cellW;
+        const y = j * cellH;
+        const wave = Math.sin(i * 0.3 + this.time) * Math.cos(j * 0.3 + this.time * 0.7) * 15;
+        const dx = mouse.x - x;
+        const dy = mouse.y - y;
+        const dist = Math.sqrt(dx*dx + dy*dy);
+        const mouseInfluence = Math.max(0, 1 - dist / 200) * 30;
+        const offsetY = wave + mouseInfluence;
+        
+        if (j === 0) ctx.moveTo(x, y + offsetY);
+        else ctx.lineTo(x, y + offsetY);
+      }
+      ctx.stroke();
+    }
+  }
+}
+
+// ======== CONSTELLATION ========
+class Constellation {
+  constructor() {
+    this.points = [];
+    this.connections = [];
+    for (let i = 0; i < 60; i++) {
+      this.points.push({
+        x: Math.random() * width,
+        y: Math.random() * height,
+        vx: (Math.random() - 0.5) * 0.5,
+        vy: (Math.random() - 0.5) * 0.5,
+        radius: Math.random() * 2 + 1
+      });
+    }
+  }
+  
+  update(dt) {
+    this.points.forEach(p => {
+      p.x += p.vx;
+      p.y += p.vy;
+      
+      if (p.x < 0 || p.x > width) p.vx *= -1;
+      if (p.y < 0 || p.y > height) p.vy *= -1;
+      
+      // Mouse attraction
+      const dx = mouse.x - p.x;
+      const dy = mouse.y - p.y;
+      const dist = Math.sqrt(dx*dx + dy*dy);
+      if (dist < 150) {
+        p.vx += dx * 0.001;
+        p.vy += dy * 0.001;
+      }
+    });
+  }
+  
+  draw(ctx) {
+    ctx.fillStyle = 'rgba(10, 10, 15, 0.2)';
+    ctx.fillRect(0, 0, width, height);
+    
+    // Draw connections
+    ctx.lineWidth = 1;
+    for (let i = 0; i < this.points.length; i++) {
+      for (let j = i + 1; j < this.points.length; j++) {
+        const dx = this.points[i].x - this.points[j].x;
+        const dy = this.points[i].y - this.points[j].y;
+        const dist = Math.sqrt(dx*dx + dy*dy);
+        
+        if (dist < 120) {
+          const alpha = (1 - dist / 120) * 0.5;
+          ctx.strokeStyle = `rgba(129, 140, 248, ${alpha})`;
+          ctx.beginPath();
+          ctx.moveTo(this.points[i].x, this.points[i].y);
+          ctx.lineTo(this.points[j].x, this.points[j].y);
+          ctx.stroke();
+        }
+      }
+    }
+    
+    // Draw points
+    this.points.forEach(p => {
+      ctx.beginPath();
+      ctx.arc(p.x, p.y, p.radius, 0, Math.PI * 2);
+      ctx.fillStyle = '#818cf8';
+      ctx.fill();
+      
+      ctx.beginPath();
+      ctx.arc(p.x, p.y, p.radius * 4, 0, Math.PI * 2);
+      ctx.fillStyle = 'rgba(129, 140, 248, 0.1)';
+      ctx.fill();
+    });
+    
+    // Mouse glow
+    ctx.beginPath();
+    ctx.arc(mouse.x, mouse.y, 20, 0, Math.PI * 2);
+    ctx.fillStyle = 'rgba(99, 102, 241, 0.2)';
+    ctx.fill();
+  }
+}
+
+// ======== RIPPLE SYSTEM ========
+class RippleSystem {
+  constructor() {
+    this.ripples = [];
+    this.time = 0;
+    this.autoRippleTimer = 0;
+  }
+  
+  update(dt) {
+    this.time += dt;
+    this.autoRippleTimer += dt;
+    
+    // Auto generate ripple
+    if (this.autoRippleTimer > 2) {
+      this.ripples.push({
+        x: Math.random() * width,
+        y: Math.random() * height,
+        radius: 0,
+        maxRadius: 150 + Math.random() * 100,
+        alpha: 1,
+        speed: 80 + Math.random() * 40
+      });
+      this.autoRippleTimer = 0;
+    }
+    
+    // Mouse click ripple
+    if (mouse.isDown && !this.lastMouseDown) {
+      this.ripples.push({
+        x: mouse.x,
+        y: mouse.y,
+        radius: 0,
+        maxRadius: 200,
+        alpha: 1,
+        speed: 100
+      });
+    }
+    this.lastMouseDown = mouse.isDown;
+    
+    // Update ripples
+    this.ripples = this.ripples.filter(r => r.alpha > 0.01);
+    this.ripples.forEach(r => {
+      r.radius += r.speed * dt;
+      r.alpha = 1 - (r.radius / r.maxRadius);
+    });
+  }
+  
+  draw(ctx) {
+    ctx.fillStyle = 'rgba(10, 10, 15, 0.15)';
+    ctx.fillRect(0, 0, width, height);
+    
+    this.ripples.forEach(r => {
+      // Outer ring
+      ctx.beginPath();
+      ctx.arc(r.x, r.y, r.radius, 0, Math.PI * 2);
+      ctx.strokeStyle = `rgba(99, 102, 241, ${r.alpha * 0.8})`;
+      ctx.lineWidth = 3;
+      ctx.stroke();
+      
+      // Inner glow
+      ctx.beginPath();
+      ctx.arc(r.x, r.y, r.radius * 0.7, 0, Math.PI * 2);
+      ctx.strokeStyle = `rgba(192, 132, 252, ${r.alpha * 0.4})`;
+      ctx.lineWidth = 1;
+      ctx.stroke();
+      
+      // Center dot
+      if (r.radius < 20) {
+        ctx.beginPath();
+        ctx.arc(r.x, r.y, 5 - r.radius * 0.2, 0, Math.PI * 2);
+        ctx.fillStyle = `rgba(255, 255, 255, ${r.alpha})`;
+        ctx.fill();
+      }
+    });
+    
+    // Grid background
+    ctx.strokeStyle = 'rgba(99, 102, 241, 0.05)';
+    ctx.lineWidth = 1;
+    const gridSize = 40;
+    for (let x = 0; x < width; x += gridSize) {
+      ctx.beginPath();
+      ctx.moveTo(x, 0);
+      ctx.lineTo(x, height);
+      ctx.stroke();
+    }
+    for (let y = 0; y < height; y += gridSize) {
+      ctx.beginPath();
+      ctx.moveTo(0, y);
+      ctx.lineTo(width, y);
+      ctx.stroke();
+    }
+  }
+}
+
+// ======== MAIN LOOP ========
+let particles = new ParticleSystem(800);
+let waves = new WaveGrid();
+let constellation = new Constellation();
+let ripples = new RippleSystem();
+
+function animate(timestamp) {
+  const dt = Math.min((timestamp - lastTime) / 1000, 0.1);
+  lastTime = timestamp;
+  
+  ctx.clearRect(0, 0, width, height);
+  
+  switch(currentTab) {
+    case 'particles':
+      particles.update(dt);
+      particles.draw(ctx);
+      stats.textContent = `FPS: ${Math.round(1/dt)} | Particles: 800 | Gravity: ${mouse.isDown ? 'Repel' : 'Attract'}`;
+      break;
+    case 'waves':
+      waves.update(dt);
+      waves.draw(ctx);
+      stats.textContent = `FPS: ${Math.round(1/dt)} | Grid: 30x20 | Time: ${waves.time.toFixed(1)}`;
+      break;
+    case 'constellation':
+      constellation.update(dt);
+      constellation.draw(ctx);
+      stats.textContent = `FPS: ${Math.round(1/dt)} | Nodes: 60 | Connections: Dynamic`;
+      break;
+    case 'ripple':
+      ripples.update(dt);
+      ripples.draw(ctx);
+      stats.textContent = `FPS: ${Math.round(1/dt)} | Ripples: ${ripples.ripples.length} | Click to spawn`;
+      break;
+  }
+  
+  animationId = requestAnimationFrame(animate);
+}
+
+// Tab switching
+function switchTab(tab) {
+  currentTab = tab;
+  
+  // Update UI
+  document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+  event.target.classList.add('active');
+  
+  // Update info panel
+  const infoPanel = document.getElementById('infoPanel');
+  const infos = {
+    particles: {
+      title: '✨ 粒子引力场系统',
+      desc: '模拟 800 个粒子在二维空间中的物理运动。每个粒子受鼠标位置产生的引力场影响，同时带有速度衰减（摩擦力）和边界反弹。点击时会在鼠标位置产生一个径向冲击波，将周围粒子推开。',
+      code: `<span class="comment">// 核心物理更新逻辑</span>
+<span class="keyword">const</span> dx = mouse.x - particle.x;
+<span class="keyword">const</span> dy = mouse.y - particle.y;
+<span class="keyword">const</span> dist = Math.sqrt(dx*dx + dy*dy);
+<span class="keyword">const</span> force = (dist < <span class="number">200</span>) ? (mouse.isDown ? <span class="number">-500</span> : <span class="number">200</span>) / dist : <span class="number">0</span>;
+particle.vx += (dx / dist) * force * dt;
+particle.vy += (dy / dist) * force * dt;
+particle.vx *= <span class="number">0.95</span>; <span class="comment">// 摩擦力衰减</span>`
+    },
+    waves: {
+      title: '🌊 正弦波网格变形',
+      desc: '使用双重正弦函数叠加生成动态波浪效果。网格上的每个点根据时间和空间坐标计算高度偏移，同时鼠标靠近时会产生局部的振幅增强。这种技术常用于 3D 地形生成和水体模拟。',
+      code: `<span class="comment">// 波浪高度计算</span>
+<span class="keyword">const</span> wave = Math.sin(i * <span class="number">0.3</span> + time) * 
+             Math.cos(j * <span class="number">0.3</span> + time * <span class="number">0.7</span>) * <span class="number">15</span>;
+<span class="keyword">const</span> mouseInfluence = Math.max(<span class="number">0</span>, <span class="number">1</span> - dist / <span class="number">200</span>) * <span class="number">30</span>;
+<span class="keyword">const</span> height = <span class="number">5</span> + Math.abs(wave) + mouseInfluence;`
+    },
+    constellation: {
+      title: '🌌 动态星座连线',
+      desc: '模拟星空中的节点自动漫游，当两个节点距离小于阈值时自动绘制连线。鼠标靠近时节点会被轻微吸引。这种效果在科技类网站的背景中非常常见，使用空间分割算法（如 QuadTree）可以优化大规模节点的性能。',
+      code: `<span class="comment">// 距离检测与连线</span>
+<span class="keyword">for</span> (<span class="keyword">let</span> j = i + <span class="number">1</span>; j < points.length; j++) {
+  <span class="keyword">const</span> dist = distance(points[i], points[j]);
+  <span class="keyword">if</span> (dist < <span class="number">120</span>) {
+    <span class="keyword">const</span> alpha = (<span class="number">1</span> - dist / <span class="number">120</span>) * <span class="number">0.5</span>;
+    drawLine(points[i], points[j], alpha);
+  }
+}`
+    },
+    ripple: {
+      title: '💧 波纹扩散系统',
+      desc: '模拟水波纹的扩散效果。每个波纹从中心点开始以恒定速度向外扩散，同时透明度随半径增大而衰减。系统会自动生成随机波纹，也支持鼠标点击触发生成。这种效果常用于按钮点击反馈和页面转场动画。',
+      code: `<span class="comment">// 波纹更新与渲染</span>
+ripple.radius += speed * dt;
+ripple.alpha = <span class="number">1</span> - (ripple.radius / maxRadius);
+
+ctx.beginPath();
+ctx.arc(ripple.x, ripple.y, ripple.radius, <span class="number">0</span>, Math.PI * <span class="number">2</span>);
+ctx.strokeStyle = <span class="string">\`rgba(99, 102, 241, \${ripple.alpha})\`</span>;
+ctx.lineWidth = <span class="number">3</span>;
+ctx.stroke();`
+    }
+  };
+  
+  const info = infos[tab];
+  infoPanel.innerHTML = `
+    <h3>${info.title}</h3>
+    <p>${info.desc}</p>
+    <div class="code-block">${info.code}</div>
+  `;
+  
+  // Update hint
+  const hints = {
+    particles: '移动鼠标吸引粒子 · 点击产生冲击波',
+    waves: '移动鼠标增强局部波浪振幅',
+    constellation: '移动鼠标吸引节点 · 观察自动连线',
+    ripple: '点击画布生成波纹 · 自动产生随机波纹'
+  };
+  hint.textContent = hints[tab];
+}
+
+// Start
+animate(0);
+</script>
+</parameter>
+</invoke>
+</function_calls>

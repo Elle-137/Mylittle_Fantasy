@@ -1,0 +1,632 @@
+<function_calls>
+<invoke name="show_widget"><parameter name="title">
+<parameter name="loading_messages">
+<parameter name="widget_code">
+<style>
+  :root {
+    --bg: #0a0e27;
+    --panel: #111936;
+    --border: #1e3a5f;
+    --accent: #00d4aa;
+    --accent-warn: #f59e0b;
+    --accent-danger: #ef4444;
+    --text: #e2e8f0;
+    --text-dim: #64748b;
+    --grid: rgba(30, 58, 95, 0.3);
+  }
+  
+  .backend-container {
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'JetBrains Mono', 'Fira Code', monospace;
+    padding: 20px;
+    border-radius: 12px;
+    max-width: 900px;
+    margin: 0 auto;
+  }
+  
+  .backend-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 16px;
+  }
+  
+  .backend-header h2 {
+    margin: 0;
+    font-size: 18px;
+    color: var(--accent);
+    text-shadow: 0 0 10px rgba(0, 212, 170, 0.3);
+  }
+  
+  .status-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 4px 12px;
+    border-radius: 20px;
+    font-size: 12px;
+    background: rgba(0, 212, 170, 0.1);
+    border: 1px solid var(--accent);
+    color: var(--accent);
+  }
+  
+  .status-badge::before {
+    content: '';
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background: var(--accent);
+    animation: pulse 2s infinite;
+  }
+  
+  @keyframes pulse {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.3; }
+  }
+  
+  .metrics-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 12px;
+    margin-bottom: 16px;
+  }
+  
+  .metric-card {
+    background: var(--panel);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 12px;
+    position: relative;
+    overflow: hidden;
+  }
+  
+  .metric-card::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 2px;
+    background: linear-gradient(90deg, transparent, var(--accent), transparent);
+    opacity: 0.5;
+  }
+  
+  .metric-label {
+    font-size: 11px;
+    color: var(--text-dim);
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    margin-bottom: 4px;
+  }
+  
+  .metric-value {
+    font-size: 24px;
+    font-weight: 700;
+    color: var(--text);
+    font-variant-numeric: tabular-nums;
+  }
+  
+  .metric-change {
+    font-size: 11px;
+    margin-top: 4px;
+  }
+  
+  .metric-change.up { color: var(--accent); }
+  .metric-change.down { color: var(--accent-danger); }
+  
+  .main-area {
+    display: grid;
+    grid-template-columns: 2fr 1fr;
+    gap: 12px;
+    margin-bottom: 16px;
+  }
+  
+  .chart-panel, .log-panel, .topology-panel {
+    background: var(--panel);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 12px;
+  }
+  
+  .panel-title {
+    font-size: 12px;
+    color: var(--text-dim);
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    margin-bottom: 8px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+  
+  .chart-canvas {
+    width: 100%;
+    height: 160px;
+  }
+  
+  .log-container {
+    height: 160px;
+    overflow-y: auto;
+    font-size: 11px;
+    line-height: 1.6;
+  }
+  
+  .log-entry {
+    padding: 2px 0;
+    border-left: 2px solid transparent;
+    padding-left: 8px;
+    margin: 2px 0;
+    animation: slideIn 0.3s ease;
+  }
+  
+  @keyframes slideIn {
+    from { opacity: 0; transform: translateX(-10px); }
+    to { opacity: 1; transform: translateX(0); }
+  }
+  
+  .log-entry.info { border-color: var(--accent); color: #94a3b8; }
+  .log-entry.warn { border-color: var(--accent-warn); color: var(--accent-warn); }
+  .log-entry.error { border-color: var(--accent-danger); color: var(--accent-danger); }
+  .log-entry.success { border-color: var(--accent); color: var(--accent); }
+  
+  .topology-canvas {
+    width: 100%;
+    height: 200px;
+  }
+  
+  .controls {
+    display: flex;
+    gap: 8px;
+    margin-top: 12px;
+  }
+  
+  .ctrl-btn {
+    padding: 8px 16px;
+    border-radius: 6px;
+    border: 1px solid var(--border);
+    background: var(--panel);
+    color: var(--text);
+    font-family: inherit;
+    font-size: 12px;
+    cursor: pointer;
+    transition: all 0.2s;
+  }
+  
+  .ctrl-btn:hover {
+    border-color: var(--accent);
+    color: var(--accent);
+  }
+  
+  .ctrl-btn.active {
+    background: var(--accent);
+    color: var(--bg);
+    border-color: var(--accent);
+  }
+  
+  .latency-bar {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-top: 8px;
+  }
+  
+  .latency-track {
+    flex: 1;
+    height: 4px;
+    background: var(--border);
+    border-radius: 2px;
+    overflow: hidden;
+  }
+  
+  .latency-fill {
+    height: 100%;
+    border-radius: 2px;
+    transition: width 0.5s ease;
+  }
+  
+  .latency-label {
+    font-size: 11px;
+    color: var(--text-dim);
+    min-width: 50px;
+    text-align: right;
+  }
+</style>
+<div class="backend-container">
+  <div class="backend-header">
+    <h2>◈ distributed-cluster-monitor</h2>
+    <span class="status-badge">SYSTEM HEALTHY</span>
+  </div>
+  <div class="metrics-grid">
+    <div class="metric-card">
+      <div class="metric-label">QPS (Queries/sec)</div>
+      <div class="metric-value" id="qps">12,847</div>
+      <div class="metric-change up">↑ 23% vs 1m ago</div>
+    </div>
+    <div class="metric-card">
+      <div class="metric-label">Latency P99</div>
+      <div class="metric-value" id="latency">45ms</div>
+      <div class="metric-change up">↓ 12% vs 1m ago</div>
+    </div>
+    <div class="metric-card">
+      <div class="metric-label">Active Connections</div>
+      <div class="metric-value" id="connections">8,932</div>
+      <div class="metric-change down">↑ 5% vs 1m ago</div>
+    </div>
+    <div class="metric-card">
+      <div class="metric-label">Error Rate</div>
+      <div class="metric-value" id="errorRate">0.02%</div>
+      <div class="metric-change up">↓ 0.01% vs 1m ago</div>
+    </div>
+  </div>
+  <div class="main-area">
+    <div class="chart-panel">
+      <div class="panel-title">
+        <span>实时流量 (req/s)</span>
+        <span style="color: var(--accent); font-size: 11px;">▮ LIVE</span>
+      </div>
+      <canvas class="chart-canvas" id="trafficChart"></canvas>
+    </div>
+    <div class="log-panel">
+      <div class="panel-title">
+        <span>系统日志</span>
+        <span style="color: var(--text-dim); font-size: 11px;">tail -f /var/log/app</span>
+      </div>
+      <div class="log-container" id="logContainer"></div>
+    </div>
+  </div>
+  <div class="topology-panel">
+    <div class="panel-title">
+      <span>服务拓扑图</span>
+      <span style="color: var(--accent); font-size: 11px;">5 nodes · 12 edges</span>
+    </div>
+    <canvas class="topology-canvas" id="topologyCanvas"></canvas>
+  </div>
+  <div class="controls">
+    <button class="ctrl-btn active" onclick="setLoad('low')">低负载</button>
+    <button class="ctrl-btn" onclick="setLoad('medium')">中负载</button>
+    <button class="ctrl-btn" onclick="setLoad('high')">高负载</button>
+    <button class="ctrl-btn" onclick="setLoad('spike')">⚡ 流量突增</button>
+    <button class="ctrl-btn" onclick="triggerFailover()" style="margin-left: auto; border-color: var(--accent-danger); color: var(--accent-danger);">模拟节点故障</button>
+  </div>
+</div>
+<script>
+// ======== STATE ========
+let loadLevel = 'low';
+let time = 0;
+let trafficHistory = new Array(60).fill(1000);
+let logs = [];
+let nodes = [];
+let packets = [];
+let failedNode = null;
+
+// ======== INIT ========
+const trafficCanvas = document.getElementById('trafficChart');
+const trafficCtx = trafficCanvas.getContext('2d');
+const topoCanvas = document.getElementById('topologyCanvas');
+const topoCtx = topoCanvas.getContext('2d');
+const logContainer = document.getElementById('logContainer');
+
+function resize() {
+  trafficCanvas.width = trafficCanvas.parentElement.clientWidth;
+  trafficCanvas.height = 160;
+  topoCanvas.width = topoCanvas.parentElement.clientWidth;
+  topoCanvas.height = 200;
+}
+window.addEventListener('resize', resize);
+resize();
+
+// ======== NODES ========
+function initNodes() {
+  const w = topoCanvas.width;
+  const h = topoCanvas.height;
+  nodes = [
+    { id: 'lb', x: w*0.15, y: h*0.5, label: 'Nginx\nLB', type: 'gateway', status: 'up' },
+    { id: 'api1', x: w*0.4, y: h*0.25, label: 'API-1\nGo', type: 'service', status: 'up' },
+    { id: 'api2', x: w*0.4, y: h*0.75, label: 'API-2\nGo', type: 'service', status: 'up' },
+    { id: 'cache', x: w*0.65, y: h*0.35, label: 'Redis\nCluster', type: 'cache', status: 'up' },
+    { id: 'db', x: w*0.65, y: h*0.65, label: 'PostgreSQL\nPrimary', type: 'db', status: 'up' },
+    { id: 'mq', x: w*0.88, y: h*0.5, label: 'Kafka\nBroker', type: 'queue', status: 'up' }
+  ];
+}
+initNodes();
+
+// ======== LOGS ========
+function addLog(level, message) {
+  const entry = document.createElement('div');
+  entry.className = `log-entry ${level}`;
+  const time = new Date().toLocaleTimeString('zh-CN', { hour12: false });
+  entry.textContent = `[${time}] ${message}`;
+  logContainer.appendChild(entry);
+  logContainer.scrollTop = logContainer.scrollHeight;
+  
+  // Keep only last 20
+  while (logContainer.children.length > 20) {
+    logContainer.removeChild(logContainer.firstChild);
+  }
+}
+
+addLog('success', 'System initialized, all nodes healthy');
+addLog('info', 'Load balancer configured with round-robin strategy');
+addLog('info', 'Redis connection pool: 50 active connections');
+
+// ======== TRAFFIC CHART ========
+function updateTraffic() {
+  let base;
+  switch(loadLevel) {
+    case 'low': base = 2000 + Math.sin(time * 0.5) * 500; break;
+    case 'medium': base = 8000 + Math.sin(time * 0.8) * 2000; break;
+    case 'high': base = 25000 + Math.sin(time * 1.2) * 5000; break;
+    case 'spike': base = 50000 + Math.sin(time * 3) * 15000 + Math.random() * 10000; break;
+  }
+  
+  if (failedNode) base *= 0.7; // Degraded performance
+  
+  trafficHistory.push(base);
+  trafficHistory.shift();
+  
+  // Update metrics
+  document.getElementById('qps').textContent = Math.round(base).toLocaleString();
+  
+  let lat = loadLevel === 'spike' ? 120 + Math.random() * 50 : 
+            loadLevel === 'high' ? 65 + Math.random() * 20 :
+            loadLevel === 'medium' ? 35 + Math.random() * 10 : 15 + Math.random() * 5;
+  if (failedNode) lat += 80;
+  document.getElementById('latency').textContent = Math.round(lat) + 'ms';
+  
+  let errs = loadLevel === 'spike' ? 2.5 : loadLevel === 'high' ? 0.5 : 0.02;
+  if (failedNode) errs += 1.2;
+  document.getElementById('errorRate').textContent = errs.toFixed(2) + '%';
+  
+  let conns = Math.round(base * 0.7);
+  document.getElementById('connections').textContent = conns.toLocaleString();
+}
+
+function drawTraffic() {
+  const w = trafficCanvas.width;
+  const h = trafficCanvas.height;
+  trafficCtx.clearRect(0, 0, w, h);
+  
+  // Grid
+  trafficCtx.strokeStyle = 'rgba(30, 58, 95, 0.3)';
+  trafficCtx.lineWidth = 1;
+  for (let i = 0; i < 5; i++) {
+    const y = (h / 4) * i;
+    trafficCtx.beginPath();
+    trafficCtx.moveTo(0, y);
+    trafficCtx.lineTo(w, y);
+    trafficCtx.stroke();
+  }
+  
+  // Area
+  const maxVal = Math.max(...trafficHistory) * 1.2;
+  trafficCtx.beginPath();
+  trafficCtx.moveTo(0, h);
+  
+  trafficHistory.forEach((val, i) => {
+    const x = (i / (trafficHistory.length - 1)) * w;
+    const y = h - (val / maxVal) * h;
+    trafficCtx.lineTo(x, y);
+  });
+  
+  trafficCtx.lineTo(w, h);
+  trafficCtx.closePath();
+  
+  const grad = trafficCtx.createLinearGradient(0, 0, 0, h);
+  grad.addColorStop(0, 'rgba(0, 212, 170, 0.3)');
+  grad.addColorStop(1, 'rgba(0, 212, 170, 0)');
+  trafficCtx.fillStyle = grad;
+  trafficCtx.fill();
+  
+  // Line
+  trafficCtx.beginPath();
+  trafficHistory.forEach((val, i) => {
+    const x = (i / (trafficHistory.length - 1)) * w;
+    const y = h - (val / maxVal) * h;
+    if (i === 0) trafficCtx.moveTo(x, y);
+    else trafficCtx.lineTo(x, y);
+  });
+  trafficCtx.strokeStyle = '#00d4aa';
+  trafficCtx.lineWidth = 2;
+  trafficCtx.stroke();
+  
+  // Glow dot at end
+  const lastX = w;
+  const lastY = h - (trafficHistory[trafficHistory.length-1] / maxVal) * h;
+  trafficCtx.beginPath();
+  trafficCtx.arc(lastX - 3, lastY, 4, 0, Math.PI * 2);
+  trafficCtx.fillStyle = '#00d4aa';
+  trafficCtx.fill();
+  trafficCtx.beginPath();
+  trafficCtx.arc(lastX - 3, lastY, 8, 0, Math.PI * 2);
+  trafficCtx.fillStyle = 'rgba(0, 212, 170, 0.3)';
+  trafficCtx.fill();
+}
+
+// ======== TOPOLOGY ========
+function spawnPacket() {
+  const edges = [
+    ['lb', 'api1'], ['lb', 'api2'],
+    ['api1', 'cache'], ['api1', 'db'],
+    ['api2', 'cache'], ['api2', 'db'],
+    ['api1', 'mq'], ['api2', 'mq']
+  ];
+  
+  const [from, to] = edges[Math.floor(Math.random() * edges.length)];
+  const fromNode = nodes.find(n => n.id === from);
+  const toNode = nodes.find(n => n.id === to);
+  
+  if (fromNode.status === 'down' || toNode.status === 'down') return;
+  
+  packets.push({
+    from: fromNode, to: toNode,
+    progress: 0, speed: 0.02 + Math.random() * 0.02,
+    color: Math.random() > 0.9 ? '#f59e0b' : '#00d4aa'
+  });
+}
+
+function updatePackets() {
+  packets.forEach(p => p.progress += p.speed);
+  packets = packets.filter(p => p.progress < 1);
+}
+
+function drawTopology() {
+  const w = topoCanvas.width;
+  const h = topoCanvas.height;
+  topoCtx.clearRect(0, 0, w, h);
+  
+  // Draw connections
+  const edges = [
+    ['lb', 'api1'], ['lb', 'api2'],
+    ['api1', 'cache'], ['api1', 'db'],
+    ['api2', 'cache'], ['api2', 'db'],
+    ['api1', 'mq'], ['api2', 'mq']
+  ];
+  
+  edges.forEach(([from, to]) => {
+    const n1 = nodes.find(n => n.id === from);
+    const n2 = nodes.find(n => n.id === to);
+    
+    topoCtx.beginPath();
+    topoCtx.moveTo(n1.x, n1.y);
+    topoCtx.lineTo(n2.x, n2.y);
+    
+    const isDown = n1.status === 'down' || n2.status === 'down';
+    topoCtx.strokeStyle = isDown ? 'rgba(239, 68, 68, 0.3)' : 'rgba(0, 212, 170, 0.2)';
+    topoCtx.lineWidth = isDown ? 1 : 2;
+    topoCtx.setLineDash(isDown ? [5, 5] : []);
+    topoCtx.stroke();
+    topoCtx.setLineDash([]);
+  });
+  
+  // Draw packets
+  packets.forEach(p => {
+    const x = p.from.x + (p.to.x - p.from.x) * p.progress;
+    const y = p.from.y + (p.to.y - p.from.y) * p.progress;
+    
+    topoCtx.beginPath();
+    topoCtx.arc(x, y, 3, 0, Math.PI * 2);
+    topoCtx.fillStyle = p.color;
+    topoCtx.fill();
+    
+    topoCtx.beginPath();
+    topoCtx.arc(x, y, 6, 0, Math.PI * 2);
+    topoCtx.fillStyle = p.color === '#f59e0b' ? 'rgba(245, 158, 11, 0.2)' : 'rgba(0, 212, 170, 0.2)';
+    topoCtx.fill();
+  });
+  
+  // Draw nodes
+  nodes.forEach(n => {
+    // Glow
+    if (n.status === 'up') {
+      topoCtx.beginPath();
+      topoCtx.arc(n.x, n.y, 25, 0, Math.PI * 2);
+      topoCtx.fillStyle = n.type === 'gateway' ? 'rgba(0, 212, 170, 0.1)' : 
+                          n.type === 'db' ? 'rgba(192, 132, 252, 0.1)' : 'rgba(99, 102, 241, 0.1)';
+      topoCtx.fill();
+    }
+    
+    // Circle
+    topoCtx.beginPath();
+    topoCtx.arc(n.x, n.y, 18, 0, Math.PI * 2);
+    topoCtx.fillStyle = n.status === 'down' ? '#1a0505' : '#0f172a';
+    topoCtx.fill();
+    topoCtx.strokeStyle = n.status === 'down' ? '#ef4444' : 
+                         n.type === 'gateway' ? '#00d4aa' :
+                         n.type === 'db' ? '#c084fc' : '#818cf8';
+    topoCtx.lineWidth = 2;
+    topoCtx.stroke();
+    
+    // Inner dot
+    if (n.status === 'up') {
+      topoCtx.beginPath();
+      topoCtx.arc(n.x, n.y, 5, 0, Math.PI * 2);
+      topoCtx.fillStyle = n.type === 'gateway' ? '#00d4aa' :
+                          n.type === 'db' ? '#c084fc' : '#818cf8';
+      topoCtx.fill();
+    } else {
+      // X mark
+      topoCtx.strokeStyle = '#ef4444';
+      topoCtx.lineWidth = 2;
+      topoCtx.beginPath();
+      topoCtx.moveTo(n.x - 6, n.y - 6);
+      topoCtx.lineTo(n.x + 6, n.y + 6);
+      topoCtx.moveTo(n.x + 6, n.y - 6);
+      topoCtx.lineTo(n.x - 6, n.y + 6);
+      topoCtx.stroke();
+    }
+    
+    // Label
+    topoCtx.fillStyle = n.status === 'down' ? '#ef4444' : '#94a3b8';
+    topoCtx.font = '10px monospace';
+    topoCtx.textAlign = 'center';
+    const lines = n.label.split('\n');
+    lines.forEach((line, i) => {
+      topoCtx.fillText(line, n.x, n.y + 32 + i * 14);
+    });
+  });
+}
+
+// ======== CONTROLS ========
+function setLoad(level) {
+  loadLevel = level;
+  document.querySelectorAll('.ctrl-btn').forEach(b => {
+    if (b.textContent.includes('负载') || b.textContent.includes('突增')) {
+      b.classList.remove('active');
+    }
+  });
+  event.target.classList.add('active');
+  
+  const msgs = {
+    low: 'Load decreased to normal levels',
+    medium: 'Traffic increased to medium load',
+    high: 'High load detected, auto-scaling triggered',
+    spike: 'ALERT: Traffic spike detected! Rate limiting activated'
+  };
+  addLog(level === 'spike' ? 'warn' : 'info', msgs[level]);
+}
+
+function triggerFailover() {
+  if (failedNode) {
+    // Recover
+    const node = nodes.find(n => n.id === failedNode);
+    node.status = 'up';
+    addLog('success', `Node ${node.label.replace('\n', ' ')} recovered, traffic resuming`);
+    failedNode = null;
+    event.target.textContent = '模拟节点故障';
+    event.target.style.borderColor = 'var(--accent-danger)';
+    event.target.style.color = 'var(--accent-danger)';
+  } else {
+    // Fail
+    const candidates = nodes.filter(n => n.id !== 'lb');
+    const victim = candidates[Math.floor(Math.random() * candidates.length)];
+    victim.status = 'down';
+    failedNode = victim.id;
+    addLog('error', `CRITICAL: Node ${victim.label.replace('\n', ' ')} DOWN! Failover initiated`);
+    event.target.textContent = '恢复节点';
+    event.target.style.borderColor = 'var(--accent)';
+    event.target.style.color = 'var(--accent)';
+  }
+}
+
+// ======== MAIN LOOP ========
+function animate() {
+  time += 0.05;
+  
+  updateTraffic();
+  drawTraffic();
+  
+  if (Math.random() < (loadLevel === 'spike' ? 0.3 : loadLevel === 'high' ? 0.15 : 0.05)) {
+    spawnPacket();
+  }
+  updatePackets();
+  drawTopology();
+  
+  requestAnimationFrame(animate);
+}
+
+animate();
+</script>
+</parameter>
+</invoke>
+</function_calls>

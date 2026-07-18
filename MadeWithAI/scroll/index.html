@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>单向左循环背景</title>
+<style>
+    * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+    }
+
+    html, body {
+        width: 100%;
+        height: 100%;
+        overflow: hidden;
+    }
+
+    /* 背景层：永远填满视口，图片从中心开始并向左连续循环 */
+    .bg-wrap {
+        position: fixed;
+        inset: 0;
+        z-index: -1;
+        overflow: hidden;
+    }
+
+    /* 单张图片元素，通过重复线性排列实现“无限”循环 */
+    .bg {
+        position: absolute;
+        top: 0;
+        height: 100%;
+        width: 300%;              /* 3 倍视口宽，足够循环 */
+        background-image: url("./img/1.png");
+        background-size: 33.333% 100%; /* 每张图占 1/3 宽度 */
+        background-repeat: repeat-x;
+        /* 初始位置：让第一张图中心与视口中心对齐 */
+        left: 50%;
+        transform: translateX(-50%);
+        animation: scrollLeft 12s linear infinite;
+    }
+
+    /* 从右向左移动一个完整图片宽度的距离 */
+    @keyframes scrollLeft {
+        0%   { transform: translateX(-50%); }
+        100% { transform: translateX(calc(-50% - 640px)); }
+        /* 640px ≈ 1920/3，正好是单张图在视口中的宽度 */
+    }
+</style>
+</head>
+<body>
+    <div class="bg-wrap">
+        <div class="bg"></div>
+    </div>
+</body>
+</html>

@@ -1,0 +1,24 @@
+##  学习方向建议
+基于你的项目和兴趣（WebGL），我推荐以下学习路径：
+
+### Phase 1：夯实JavaScript基础（2-3周）
+- 学习ES6+语法（箭头函数、解构、Promise、async/await）
+- 学习模块化开发（import/export）
+- 练习DOM操作和事件处理
+- 推荐资源： JavaScript.info
+### Phase 2：选择一个前端框架深入学习（4-6周）
+建议选择Vue3 （因为New_Greeting项目使用了Vue3，可以参考）：
+
+- 学习Vue3组合式API（ref、reactive、computed、watch）
+- 学习组件通信、路由（Vue Router）、状态管理（Pinia）
+- 用Vue3重构你的个人主页项目
+### Phase 3：深入Canvas和WebGL（持续学习）
+按照你规划的路径：
+
+1. Canvas 2D ：粒子系统、动画循环、物理模拟
+2. Three.js ：场景图、几何体、材质、光照、交互
+3. GLSL着色器 ：自定义着色器、噪声函数、后期处理
+### Phase 4：实战项目建议
+1. 用Vue3重构个人主页 - 学习组件化开发
+2. 实现一个Three.js粒子背景 - 将你的学习规划中的粒子系统落地
+3. 完成博客后端 - 将Django博客项目做完，添加用户认证
